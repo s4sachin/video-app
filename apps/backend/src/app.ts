@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import { config } from './config';
 import authRoutes from './routes/auth.routes';
+import videoRoutes from './routes/video.routes';
 
 const app = express();
 
@@ -11,15 +12,20 @@ const app = express();
 app.use(helmet());
 app.use(cors({ origin: config.CORS_ORIGIN, credentials: true }));
 app.use(morgan('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
 // Health check
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// Routes
+// Routes (before body parsers for file uploads)
+app.use('/api/videos', videoRoutes);
+
+// Body parsers (after file upload routes)
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Other routes
 app.use('/api/auth', authRoutes);
 
 // 404 handler
