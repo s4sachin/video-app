@@ -13,7 +13,7 @@ export const validate = (schema: ZodSchema) => {
           error: {
             code: 'VALIDATION_ERROR',
             message: 'Validation failed',
-            details: error.errors,
+            details: error.issues,
             timestamp: new Date().toISOString(),
           },
         });

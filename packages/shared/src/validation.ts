@@ -1,24 +1,48 @@
 import { z } from 'zod';
 
-// Validation schemas using Zod
-
-export const userSchema = z.object({
-  email: z.string().email(),
-  name: z.string().min(2).max(100),
-  password: z.string().min(8),
-});
-
-export const videoSchema = z.object({
-  title: z.string().min(1).max(200),
-  description: z.string().max(1000).optional(),
-  duration: z.number().positive(),
+// Auth schemas
+export const registerSchema = z.object({
+  email: z.string().email('Invalid email address'),
+  password: z
+    .string()
+    .min(8, 'Password must be at least 8 characters')
+    .regex(/[A-Z]/, 'Password must contain uppercase letter')
+    .regex(/[0-9]/, 'Password must contain a number'),
+  firstName: z.string().min(1, 'First name is required').max(50),
+  lastName: z.string().min(1, 'Last name is required').max(50),
 });
 
 export const loginSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(1),
+  email: z.string().email('Invalid email address'),
+  password: z.string().min(1, 'Password is required'),
 });
 
-export type UserInput = z.infer<typeof userSchema>;
-export type VideoInput = z.infer<typeof videoSchema>;
+export const uploadVideoSchema = z.object({
+  title: z.string().min(1, 'Title is required').max(200),
+  description: z.string().max(2000).optional(),
+  tags: z.array(z.string().max(50)).max(10).optional(),
+});
+
+export const videoListQuerySchema = z.object({
+  page: z.coerce.number().min(1).default(1),
+  limit: z.coerce.number().min(1).max(100).default(20),
+  status: z.enum(['pending', 'processing', 'completed', 'failed']).optional(),
+  sortBy: z.enum(['uploadDate', 'title', 'size']).default('uploadDate'),
+  order: z.enum(['asc', 'desc']).default('desc'),
+  search: z.string().max(100).optional(),
+});
+
+export const ALLOWED_VIDEO_TYPES = [
+  'video/mp4',
+  'video/quicktime',
+  'video/x-msvideo',
+  'video/x-matroska',
+  'video/webm',
+] as const;
+
+export const MAX_FILE_SIZE = 2 * 1024 * 1024 * 1024; // 2GB
+
+export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
+export type UploadVideoInput = z.infer<typeof uploadVideoSchema>;
+export type VideoListQuery = z.infer<typeof videoListQuerySchema>;
