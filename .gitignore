@@ -5,3 +5,6 @@ dist/
 uploads/
 *.log
 ref-docs/
+
+# Test files
+test-*.html

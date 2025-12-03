@@ -1,4 +1,5 @@
 import { Video, IVideo } from '../models/Video';
+import { emitToUser } from '../socket';
 
 interface ProcessingResult {
   sensitivity: 'safe' | 'flagged' | 'review';
@@ -31,6 +32,13 @@ export const processVideo = async (videoId: string, userId: string): Promise<IVi
 
     console.log(`🎬 Starting processing for video: ${videoId}`);
 
+    // Emit processing started event (will be queued if user is disconnected)
+    emitToUser(userId, 'processing_started', {
+      videoId,
+      status: 'processing',
+      timestamp: new Date().toISOString(),
+    });
+
     // Simulate processing
     const result = await simulateProcessing();
 
@@ -46,15 +54,32 @@ export const processVideo = async (videoId: string, userId: string): Promise<IVi
       { new: true }
     );
 
+    // Emit processing completed event (will be queued if user is disconnected)
+    emitToUser(userId, 'processing_completed', {
+      videoId,
+      status: 'completed',
+      result,
+      timestamp: new Date().toISOString(),
+    });
+
     return video;
   } catch (error) {
     console.error(`❌ Processing failed for video: ${videoId}`, error);
-    
+
     // Mark as failed
     await Video.findByIdAndUpdate(videoId, {
       'processing.status': 'failed',
       'processing.error': 'Processing failed',
     });
+
+    // Emit processing failed event (will be queued if user is disconnected)
+    emitToUser(userId, 'processing_failed', {
+      videoId,
+      status: 'failed',
+      error: 'Processing failed',
+      timestamp: new Date().toISOString(),
+    });
+
     return null;
   }
 };

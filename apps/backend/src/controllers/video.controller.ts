@@ -40,8 +40,14 @@ export const uploadVideo = async (req: Request, res: Response) => {
       },
     });
 
-    // Trigger async processing (don't await)
-    processVideo(video._id.toString(), req.user!.userId).catch(console.error);
+    // Trigger async processing with delay to allow socket reconnection
+    // This is necessary because browsers may close WebSocket during large HTTP uploads
+    // and need time to reconnect before processing events are emitted
+    setTimeout(() => {
+      processVideo(video._id.toString(), req.user!.userId).catch((error) => {
+        console.error('Failed to start processing:', error);
+      });
+    }, 2000); // 2 second delay - increased for better reliability
 
     res.status(201).json({
       success: true,
@@ -49,7 +55,7 @@ export const uploadVideo = async (req: Request, res: Response) => {
         videoId: video._id,
         title: video.title,
         status: video.processing.status,
-        message: 'Video uploaded successfully. Processing started.',
+        message: 'Video uploaded successfully. Processing will begin shortly.',
       },
     });
   } catch (error) {
