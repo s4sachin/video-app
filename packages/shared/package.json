@@ -1,10 +1,19 @@
 {
   "name": "@video-app/shared",
   "version": "1.0.0",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && npm run build:cjs",
+    "build:cjs": "node -e \"require('fs').writeFileSync('dist/index.cjs', \\\"module.exports = require('./index.js');\\\\n\\\")\"",
     "dev": "tsc --watch"
   },
   "devDependencies": {
