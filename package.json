@@ -1,0 +1,13 @@
+{
+  "name": "video-app",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev:backend": "npm run dev --workspace=apps/backend",
+    "dev:frontend": "npm run dev --workspace=apps/frontend",
+    "build:shared": "npm run build --workspace=packages/shared"
+  }
+}
