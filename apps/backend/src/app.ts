@@ -9,8 +9,14 @@ import videoRoutes from './routes/video.routes';
 const app = express();
 
 // Middleware
-app.use(helmet());
-app.use(cors({ origin: config.CORS_ORIGIN, credentials: true }));
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
+app.use(cors({ 
+  origin: '*', // Allow all origins for development
+  credentials: true,
+  exposedHeaders: ['Content-Range', 'Accept-Ranges', 'Content-Length']
+}));
 app.use(morgan('dev'));
 
 // Health check

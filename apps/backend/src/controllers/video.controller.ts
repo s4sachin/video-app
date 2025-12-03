@@ -198,3 +198,91 @@ export const reprocessVideo = async (req: Request, res: Response) => {
     });
   }
 };
+
+export const streamVideo = async (req: Request, res: Response) => {
+  try {
+    const { videoId } = req.params;
+
+    const video = await Video.findOne({
+      _id: videoId,
+      deletedAt: null,
+    });
+
+    if (!video) {
+      return res.status(404).json({
+        success: false,
+        error: {
+          code: 'VIDEO_NOT_FOUND',
+          message: 'Video not found',
+          timestamp: new Date().toISOString(),
+        },
+      });
+    }
+
+    // Only allow streaming for completed videos
+    if (video.processing.status !== 'completed') {
+      return res.status(400).json({
+        success: false,
+        error: {
+          code: 'VIDEO_NOT_READY',
+          message: 'Video is still processing',
+          timestamp: new Date().toISOString(),
+        },
+      });
+    }
+
+    const videoPath = video.fileInfo.path;
+    const fs = require('fs');
+    const stat = fs.statSync(videoPath);
+    const fileSize = stat.size;
+    const range = req.headers.range;
+
+    // Set CORS headers first
+    res.set({
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Expose-Headers': 'Content-Range, Accept-Ranges, Content-Length',
+      'Accept-Ranges': 'bytes',
+    });
+
+    if (range) {
+      // Parse Range header (e.g., "bytes=0-1023")
+      const parts = range.replace(/bytes=/, '').split('-');
+      const start = parseInt(parts[0], 10);
+      const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
+      const chunkSize = end - start + 1;
+
+      const fileStream = fs.createReadStream(videoPath, { start, end });
+
+      res.status(206);
+      res.set({
+        'Content-Range': `bytes ${start}-${end}/${fileSize}`,
+        'Content-Length': chunkSize,
+        'Content-Type': video.fileInfo.mimeType,
+      });
+
+      fileStream.pipe(res);
+    } else {
+      // No range, send entire file
+      res.status(200);
+      res.set({
+        'Content-Length': fileSize,
+        'Content-Type': video.fileInfo.mimeType,
+      });
+
+      fs.createReadStream(videoPath).pipe(res);
+    }
+
+    // Increment view count
+    video.viewCount += 1;
+    await video.save();
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'STREAM_FAILED',
+        message: 'Failed to stream video',
+        timestamp: new Date().toISOString(),
+      },
+    });
+  }
+};
