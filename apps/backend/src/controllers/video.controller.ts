@@ -1,10 +1,13 @@
 import { Request, Response } from 'express';
 import { Video } from '../models/Video';
 import { UploadVideoInput, VideoListQuery } from '@video-app/shared';
+import { processVideo } from '../services/processing.service';
 
 export const uploadVideo = async (req: Request, res: Response) => {
   try {
-    if (!req.file) {
+    const files = req.files as Express.Multer.File[];
+    
+    if (!files || files.length === 0) {
       return res.status(400).json({
         success: false,
         error: {
@@ -15,6 +18,9 @@ export const uploadVideo = async (req: Request, res: Response) => {
       });
     }
 
+    // Accept any video file regardless of field name
+    const file = files[0];
+
     const { title, description, tags } = req.body as UploadVideoInput;
 
     const video = await Video.create({
@@ -22,11 +28,11 @@ export const uploadVideo = async (req: Request, res: Response) => {
       description,
       tags: tags || [],
       fileInfo: {
-        originalName: req.file.originalname,
-        filename: req.file.filename,
-        path: req.file.path,
-        size: req.file.size,
-        mimeType: req.file.mimetype,
+        originalName: file.originalname,
+        filename: file.filename,
+        path: file.path,
+        size: file.size,
+        mimeType: file.mimetype,
       },
       uploadedBy: req.user?.userId,
       processing: {
@@ -34,13 +40,16 @@ export const uploadVideo = async (req: Request, res: Response) => {
       },
     });
 
+    // Trigger async processing (don't await)
+    processVideo(video._id.toString(), req.user!.userId).catch(console.error);
+
     res.status(201).json({
       success: true,
       data: {
         videoId: video._id,
         title: video.title,
         status: video.processing.status,
-        message: 'Video uploaded successfully. Processing will begin shortly.',
+        message: 'Video uploaded successfully. Processing started.',
       },
     });
   } catch (error) {
@@ -139,6 +148,51 @@ export const getVideoById = async (req: Request, res: Response) => {
       error: {
         code: 'FETCH_FAILED',
         message: 'Failed to fetch video',
+        timestamp: new Date().toISOString(),
+      },
+    });
+  }
+};
+
+export const reprocessVideo = async (req: Request, res: Response) => {
+  try {
+    const { videoId } = req.params;
+
+    const video = await Video.findOne({
+      _id: videoId,
+      deletedAt: null,
+    });
+
+    if (!video) {
+      return res.status(404).json({
+        success: false,
+        error: {
+          code: 'VIDEO_NOT_FOUND',
+          message: 'Video not found',
+          timestamp: new Date().toISOString(),
+        },
+      });
+    }
+
+    // Reset and reprocess
+    await Video.findByIdAndUpdate(videoId, {
+      'processing.status': 'pending',
+      'processing.result': null,
+      'processing.error': null,
+    });
+
+    processVideo(videoId, req.user!.userId).catch(console.error);
+
+    res.json({
+      success: true,
+      message: 'Reprocessing started',
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'REPROCESS_FAILED',
+        message: 'Failed to reprocess video',
         timestamp: new Date().toISOString(),
       },
     });
