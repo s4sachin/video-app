@@ -3,6 +3,7 @@ import { useAuth } from './context/AuthContext';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
+import UploadPage from './pages/UploadPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import './App.css';
 
@@ -25,6 +26,14 @@ function App() {
           element={
             <ProtectedRoute>
               <DashboardPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/upload"
+          element={
+            <ProtectedRoute>
+              <UploadPage />
             </ProtectedRoute>
           }
         />
