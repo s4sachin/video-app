@@ -1,7 +1,9 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { io, Socket } from 'socket.io-client';
 
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000';
+import { env } from '../config/env';
+
+const SOCKET_URL = env.VITE_SOCKET_URL;
 
 export const useSocket = () => {
   const socketRef = useRef<Socket | null>(null);

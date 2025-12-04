@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
+import { env } from '../config/env';
 import Header from '../components/Header';
 
 interface VideoDetails {
@@ -74,7 +75,7 @@ const PlayerPage: React.FC = () => {
     );
   }
 
-  const streamUrl = `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/videos/${videoId}/stream`;
+  const streamUrl = `${env.VITE_API_URL}/api/videos/${videoId}/stream`;
   const token = localStorage.getItem('token');
 
   return (

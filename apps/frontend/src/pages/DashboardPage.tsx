@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import { api } from '../services/api';
 import { useSocket } from '../hooks/useSocket';
 import { useAuth } from '../context/AuthContext';
@@ -22,8 +22,7 @@ interface Video {
 }
 
 export default function DashboardPage() {
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
+  const { user } = useAuth();
   const location = useLocation();
   const message = (location.state as any)?.message;
   const { on } = useSocket();
@@ -85,11 +84,6 @@ export default function DashboardPage() {
       unsubStarted?.();
     };
   }, [on]);
-
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
 
   const handleDelete = (videoId: string) => {
     setVideos((prev) => prev.filter((v) => v._id !== videoId));

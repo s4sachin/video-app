@@ -9,7 +9,6 @@ interface FileDropZoneProps {
 
 export default function FileDropZone({ 
   onFileSelect, 
-  accept = 'video/*',
   maxSize = 100 * 1024 * 1024 // 100MB default
 }: FileDropZoneProps) {
   const [error, setError] = useState('');
