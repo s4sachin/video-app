@@ -10,7 +10,6 @@
     "dev:frontend": "npm run dev --workspace=apps/frontend",
     "build:shared": "npm run build --workspace=packages/shared",
     "build:backend": "npm run build --workspace=packages/shared && npm run build --workspace=apps/backend",
-    "vercel-build": "npm run build:shared && cd apps/frontend && npm run build",
     "build": "npm run build:backend",
     "start": "cd apps/backend && npm start"
   }
