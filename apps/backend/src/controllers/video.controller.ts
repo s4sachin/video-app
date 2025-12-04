@@ -3,6 +3,7 @@ import { Video } from '../models/Video';
 import { UploadVideoInput, VideoListQuery } from '@video-app/shared';
 import { processVideo } from '../services/processing.service';
 import fs from 'fs';
+import {config} from '../config';
 
 export const uploadVideo = async (req: Request, res: Response) => {
   try {
@@ -24,17 +25,26 @@ export const uploadVideo = async (req: Request, res: Response) => {
 
     const { title, description, tags } = req.body as UploadVideoInput;
 
+    // Handle Cloudinary vs local storage
+    const fileInfo: any = {
+      originalName: file.originalname,
+      filename: file.filename,
+      path: file.path,
+      size: file.size,
+      mimeType: file.mimetype,
+    };
+
+    // For Cloudinary uploads, store the URL and public_id
+    if (config.USE_CLOUDINARY && (file as any).cloudinaryUrl) {
+      fileInfo.cloudinaryUrl = (file as any).cloudinaryUrl || file.path;
+      fileInfo.cloudinaryPublicId = (file as any).cloudinaryPublicId || file.filename;
+    }
+
     const video = await Video.create({
       title,
       description,
       tags: tags || [],
-      fileInfo: {
-        originalName: file.originalname,
-        filename: file.filename,
-        path: file.path,
-        size: file.size,
-        mimeType: file.mimetype,
-      },
+      fileInfo,
       uploadedBy: req.user?.userId,
       processing: {
         status: 'pending',
@@ -251,7 +261,36 @@ export const streamVideo = async (req: Request, res: Response) => {
       });
     }
 
+    // If using Cloudinary, redirect to Cloudinary URL
+    if (config.USE_CLOUDINARY && video.fileInfo.cloudinaryUrl) {
+      // Increment view count before redirecting
+      video.viewCount += 1;
+      await video.save();
+      return res.redirect(video.fileInfo.cloudinaryUrl);
+    }
+
+    // Also check if path is a Cloudinary URL (fallback)
+    if (video.fileInfo.path && video.fileInfo.path.startsWith('http')) {
+      video.viewCount += 1;
+      await video.save();
+      return res.redirect(video.fileInfo.path);
+    }
+
+    // Local file streaming for development
     const videoPath = video.fileInfo.path;
+    
+    // Check if file exists before attempting to stat it
+    if (!fs.existsSync(videoPath)) {
+      return res.status(404).json({
+        success: false,
+        error: {
+          code: 'VIDEO_FILE_NOT_FOUND',
+          message: 'Video file not found on server',
+          timestamp: new Date().toISOString(),
+        },
+      });
+    }
+
     const stat = fs.statSync(videoPath);
     const fileSize = stat.size;
     const range = req.headers.range;

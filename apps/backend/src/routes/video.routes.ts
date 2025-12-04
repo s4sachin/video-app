@@ -3,7 +3,7 @@ import { uploadVideo, listVideos, getVideoById, reprocessVideo, streamVideo, del
 import { authenticate } from '../middleware/authenticate';
 import { authorize } from '../middleware/authorize';
 import { validateQuery } from '../middleware/validateQuery';
-import { upload } from '../config/upload';
+import { upload, normalizeCloudinaryFile } from '../config/upload';
 import { videoListQuerySchema } from '@video-app/shared';
 
 const router = Router();
@@ -13,6 +13,7 @@ router.post(
   authenticate,
   authorize(['admin', 'editor']),
   upload.any(),
+  normalizeCloudinaryFile,
   uploadVideo
 );
 

@@ -10,6 +10,8 @@ export interface IVideo extends Document {
     path: string;
     size: number;
     mimeType: string;
+    cloudinaryUrl?: string;
+    cloudinaryPublicId?: string;
   };
   processing: {
     status: 'pending' | 'processing' | 'completed' | 'failed';

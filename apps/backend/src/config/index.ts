@@ -9,4 +9,10 @@ export const config = {
   JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN || '7d',
   CORS_ORIGIN: process.env.CORS_ORIGIN || 'http://localhost:5173',
   UPLOAD_DIR: process.env.UPLOAD_DIR || 'uploads',
+  
+  // Cloudinary Configuration
+  CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME || '',
+  CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY || '',
+  CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET || '',
+  USE_CLOUDINARY: process.env.USE_CLOUDINARY === 'true',
 };
