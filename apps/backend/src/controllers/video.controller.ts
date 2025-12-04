@@ -292,3 +292,60 @@ export const streamVideo = async (req: Request, res: Response) => {
     });
   }
 };
+
+export const deleteVideo = async (req: Request, res: Response) => {
+  try {
+    const { videoId } = req.params;
+    const userId = req.user?.userId;
+    const userRole = req.user?.role;
+
+    const video = await Video.findOne({
+      _id: videoId,
+      deletedAt: null,
+    });
+
+    if (!video) {
+      return res.status(404).json({
+        success: false,
+        error: {
+          code: 'VIDEO_NOT_FOUND',
+          message: 'Video not found',
+          timestamp: new Date().toISOString(),
+        },
+      });
+    }
+
+    // Only owner or admin can delete
+    if (video.uploadedBy.toString() !== userId && userRole !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        error: {
+          code: 'FORBIDDEN',
+          message: 'You can only delete your own videos',
+          timestamp: new Date().toISOString(),
+        },
+      });
+    }
+
+    // Soft delete
+    await Video.findByIdAndUpdate(videoId, {
+      deletedAt: new Date(),
+    });
+
+    res.json({
+      success: true,
+      data: {
+        message: 'Video deleted successfully',
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: {
+        code: 'DELETE_FAILED',
+        message: 'Failed to delete video',
+        timestamp: new Date().toISOString(),
+      },
+    });
+  }
+};

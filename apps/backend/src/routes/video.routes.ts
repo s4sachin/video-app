@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { uploadVideo, listVideos, getVideoById, reprocessVideo, streamVideo } from '../controllers/video.controller';
+import { uploadVideo, listVideos, getVideoById, reprocessVideo, streamVideo, deleteVideo } from '../controllers/video.controller';
 import { authenticate } from '../middleware/authenticate';
 import { authorize } from '../middleware/authorize';
 import { validateQuery } from '../middleware/validateQuery';
@@ -20,5 +20,6 @@ router.get('/list', authenticate, validateQuery(videoListQuerySchema), listVideo
 router.post('/:videoId/reprocess', authenticate, authorize(['admin']), reprocessVideo);
 router.get('/:videoId/stream', authenticate, streamVideo);
 router.get('/:videoId', authenticate, getVideoById);
+router.delete('/:videoId', authenticate, deleteVideo);
 
 export default router;
