@@ -37,6 +37,25 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/video/:id"
+          element={
+            <ProtectedRoute>
+              <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+                <div className="text-center">
+                  <h1 className="text-2xl font-bold mb-4">Video Player</h1>
+                  <p className="text-gray-600 mb-4">Coming in Prompt 17!</p>
+                  <button
+                    onClick={() => window.history.back()}
+                    className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+                  >
+                    Back to Dashboard
+                  </button>
+                </div>
+              </div>
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );
