@@ -74,13 +74,26 @@ export const uploadVideo = async (req: Request, res: Response) => {
 export const listVideos = async (req: Request, res: Response) => {
   try {
     const { page, limit, status, sortBy, order, search } = req.query as unknown as VideoListQuery;
+    const userRole = req.user?.role;
 
     const query: any = {
-      uploadedBy: req.user?.userId,
       deletedAt: null,
     };
 
-    if (status) query['processing.status'] = status;
+    // Viewers can see all videos (completed ones)
+    // Editors and Admins see only their own videos
+    if (userRole === 'viewer') {
+      // Viewers should only see completed videos
+      query['processing.status'] = 'completed';
+    } else {
+      // Editors and Admins see their own videos (all statuses)
+      query.uploadedBy = req.user?.userId;
+    }
+
+    if (status && userRole !== 'viewer') {
+      query['processing.status'] = status;
+    }
+    
     if (search) {
       query.$or = [
         { title: { $regex: search, $options: 'i' } },

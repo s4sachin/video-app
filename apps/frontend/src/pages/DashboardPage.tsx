@@ -4,6 +4,7 @@ import { api } from '../services/api';
 import { useSocket } from '../hooks/useSocket';
 import { useAuth } from '../context/AuthContext';
 import VideoCard from '../components/VideoCard';
+import Header from '../components/Header';
 
 interface Video {
   _id: string;
@@ -98,42 +99,7 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center gap-8">
-              <Link to="/dashboard" className="text-xl font-bold text-gray-900">
-                🎬 Video App
-              </Link>
-              <div className="hidden md:flex gap-4">
-                <Link
-                  to="/dashboard"
-                  className="text-gray-700 hover:text-blue-600 font-medium transition"
-                >
-                  Dashboard
-                </Link>
-                <Link
-                  to="/upload"
-                  className="text-gray-700 hover:text-blue-600 font-medium transition"
-                >
-                  Upload
-                </Link>
-              </div>
-            </div>
-            <div className="flex items-center gap-4">
-              <span className="text-gray-700">
-                {user?.firstName} {user?.lastName} ({user?.role})
-              </span>
-              <button
-                onClick={handleLogout}
-                className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition"
-              >
-                Logout
-              </button>
-            </div>
-          </div>
-        </div>
-      </nav>
+      <Header />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {message && (

@@ -86,17 +86,18 @@ export default function VideoUpload() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">Upload Video</h2>
+    <div className="max-w-6xl mx-auto">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Upload Form - 2/3 width */}
+        <div className="lg:col-span-2">
+          <div className="bg-white rounded-lg shadow-md p-6">
+            {error && (
+              <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+                {error}
+              </div>
+            )}
 
-        {error && (
-          <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           {/* File Drop Zone */}
           {!selectedFile ? (
             <FileDropZone onFileSelect={handleFileSelect} />
@@ -186,6 +187,42 @@ export default function VideoUpload() {
             {isUploading ? `Uploading ${uploadProgress}%...` : 'Upload Video'}
           </button>
         </form>
+          </div>
+        </div>
+
+        {/* Upload Guidelines - 1/3 width */}
+        <div className="lg:col-span-1">
+          <div className="bg-white rounded-lg shadow-md p-6 sticky top-8">
+            <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <span className="text-xl">📝</span>
+              <span>Upload Guidelines</span>
+            </h3>
+            <ul className="space-y-3 text-sm text-gray-700">
+              <li className="flex items-start gap-2">
+                <span className="text-blue-600 font-bold mt-0.5">•</span>
+                <span><strong>Maximum file size:</strong> 100MB</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-blue-600 font-bold mt-0.5">•</span>
+                <span><strong>Supported formats:</strong> MP4, MOV, AVI, WebM</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-blue-600 font-bold mt-0.5">•</span>
+                <span><strong>Processing time:</strong> Typically 2-10 seconds</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-blue-600 font-bold mt-0.5">•</span>
+                <span>You'll receive real-time updates on the dashboard</span>
+              </li>
+            </ul>
+            
+            <div className="mt-6 pt-6 border-t border-gray-200">
+              <p className="text-xs text-gray-500 leading-relaxed">
+                💡 <strong>Tip:</strong> Videos are analyzed for content sensitivity to ensure safe viewing experience.
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

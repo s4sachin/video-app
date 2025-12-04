@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
+import Header from '../components/Header';
 
 interface VideoDetails {
   _id: string;
@@ -53,19 +54,19 @@ const PlayerPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-900">
-        <div className="text-white text-xl">Loading...</div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-gray-900 text-xl font-medium">Loading...</div>
       </div>
     );
   }
 
   if (error || !video) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-900">
-        <p className="text-red-500 text-xl mb-4">{error || 'Video not found'}</p>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
+        <p className="text-red-600 text-xl font-semibold mb-4">{error || 'Video not found'}</p>
         <button
           onClick={() => navigate('/dashboard')}
-          className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+          className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition font-medium"
         >
           Back to Dashboard
         </button>
@@ -77,26 +78,19 @@ const PlayerPage: React.FC = () => {
   const token = localStorage.getItem('token');
 
   return (
-    <div className="min-h-screen bg-black">
-      <div className="max-w-6xl mx-auto">
-        {/* Back button */}
-        <button
-          onClick={() => navigate('/dashboard')}
-          className="text-white p-4 hover:text-gray-300 flex items-center gap-2"
-        >
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-          Back to Dashboard
-        </button>
-
+    <div className="min-h-screen bg-gray-50">
+      <Header />
+      
+      <div className="max-w-6xl mx-auto py-6 px-4">
         {/* Video Player */}
+        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
         <div className="aspect-video bg-black">
           {video.processing.status === 'completed' ? (
             <video
               controls
               className="w-full h-full"
               src={`${streamUrl}?token=${token}`}
+              controlsList="nodownload"
             >
               <source
                 src={`${streamUrl}?token=${token}`}
@@ -119,35 +113,45 @@ const PlayerPage: React.FC = () => {
         </div>
 
         {/* Video Info */}
-        <div className="bg-gray-900 text-white p-6">
-          <h1 className="text-2xl font-bold">{video.title}</h1>
+        <div className="bg-white p-6">
+          <h1 className="text-2xl font-bold text-gray-900">{video.title}</h1>
           {video.description && (
-            <p className="text-gray-400 mt-2">{video.description}</p>
+            <p className="text-gray-600 mt-2 leading-relaxed">{video.description}</p>
           )}
 
-          <div className="mt-4 flex flex-wrap gap-4 text-sm text-gray-400">
-            <span>Views: {video.viewCount}</span>
-            <span>
-              Size: {(video.fileInfo.size / (1024 * 1024)).toFixed(1)} MB
-            </span>
+          <div className="mt-4 flex flex-wrap items-center gap-3 text-sm">
+            <div className="flex items-center gap-1.5 text-gray-600">
+              <span>👁️</span>
+              <span>{video.viewCount} views</span>
+            </div>
+            <span className="text-gray-300">•</span>
+            <div className="flex items-center gap-1.5 text-gray-600">
+              <span>📦</span>
+              <span>{(video.fileInfo.size / (1024 * 1024)).toFixed(1)} MB</span>
+            </div>
             {video.processing.result && (
-              <span
-                className={`px-2 py-1 rounded ${
-                  video.processing.result.sensitivity === 'safe'
-                    ? 'bg-green-600'
-                    : video.processing.result.sensitivity === 'flagged'
-                    ? 'bg-red-600'
-                    : 'bg-yellow-600'
-                }`}
-              >
-                {video.processing.result.sensitivity} (
-                {video.processing.result.confidence}% confidence)
-              </span>
+              <>
+                <span className="text-gray-300">•</span>
+                <span
+                  className={`px-3 py-1 rounded-full font-medium text-xs border-2 ${
+                    video.processing.result.sensitivity === 'safe'
+                      ? 'border-green-500 text-green-700 bg-green-50'
+                      : video.processing.result.sensitivity === 'flagged'
+                      ? 'border-red-500 text-red-700 bg-red-50'
+                      : 'border-yellow-500 text-yellow-700 bg-yellow-50'
+                  }`}
+                >
+                  {video.processing.result.sensitivity.toUpperCase()} • {video.processing.result.confidence}% confidence
+                </span>
+              </>
             )}
-            <span>
-              Uploaded: {new Date(video.createdAt).toLocaleDateString()}
-            </span>
+            <span className="text-gray-300">•</span>
+            <div className="flex items-center gap-1.5 text-gray-600">
+              <span>📅</span>
+              <span>{new Date(video.createdAt).toLocaleDateString()}</span>
+            </div>
           </div>
+        </div>
         </div>
       </div>
     </div>

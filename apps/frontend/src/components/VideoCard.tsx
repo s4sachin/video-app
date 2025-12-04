@@ -56,8 +56,29 @@ const VideoCard: React.FC<Props> = ({ video, onDelete }) => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow overflow-hidden">
-      <div className="aspect-video bg-gray-200 relative">
+    <div className="bg-white rounded-lg shadow overflow-hidden hover:shadow-lg transition-shadow group relative">
+      {/* Flagged Status Bar - Prominent top border with tooltip */}
+      {sensitivity && (
+        <>
+          <div
+            className={`h-1 ${sensitivityColors[sensitivity]}`}
+          />
+          {/* Tooltip */}
+          <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+            <span className={`text-xs font-semibold px-2 py-1 rounded shadow-lg ${
+              sensitivity === 'safe'
+                ? 'bg-green-600 text-white'
+                : sensitivity === 'flagged'
+                ? 'bg-red-600 text-white'
+                : 'bg-yellow-600 text-white'
+            }`}>
+              {sensitivity.toUpperCase()}
+            </span>
+          </div>
+        </>
+      )}
+      
+      <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 relative">
         <div className="absolute inset-0 flex items-center justify-center">
           <svg
             className="w-16 h-16 text-gray-400"
@@ -73,12 +94,6 @@ const VideoCard: React.FC<Props> = ({ video, onDelete }) => {
             />
           </svg>
         </div>
-        {sensitivity && (
-          <div
-            className={`absolute top-2 right-2 w-3 h-3 rounded-full ${sensitivityColors[sensitivity]}`}
-            title={sensitivity}
-          />
-        )}
       </div>
 
       <div className="p-4">
