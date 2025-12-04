@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { register, login, getMe } from '../controllers/auth.controller';
-import { validate } from '../middleware/validate';
-import { authenticate } from '../middleware/authenticate';
+import { register, login, getMe } from '../controllers/auth.controller.js';
+import { validate } from '../middleware/validate.js';
+import { authenticate } from '../middleware/authenticate.js';
 import { registerSchema, loginSchema } from '@video-app/shared';
 
 const router = Router();

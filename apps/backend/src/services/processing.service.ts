@@ -1,5 +1,5 @@
-import { Video, IVideo } from '../models/Video';
-import { emitToUser } from '../socket';
+import { Video, IVideo } from '../models/Video.js';
+import { emitToUser } from '../socket/index.js';
 
 interface ProcessingResult {
   sensitivity: 'safe' | 'flagged' | 'review';

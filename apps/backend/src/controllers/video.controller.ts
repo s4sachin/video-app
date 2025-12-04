@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
-import { Video } from '../models/Video';
+import { Video } from '../models/Video.js';
 import { UploadVideoInput, VideoListQuery } from '@video-app/shared';
-import { processVideo } from '../services/processing.service';
+import { processVideo } from '../services/processing.service.js';
 import fs from 'fs';
-import {config} from '../config';
+import config from '../config/index.js';
 
 export const uploadVideo = async (req: Request, res: Response) => {
   try {

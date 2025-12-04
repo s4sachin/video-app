@@ -1,9 +1,9 @@
 import { Router } from 'express';
-import { uploadVideo, listVideos, getVideoById, reprocessVideo, streamVideo, deleteVideo } from '../controllers/video.controller';
-import { authenticate } from '../middleware/authenticate';
-import { authorize } from '../middleware/authorize';
-import { validateQuery } from '../middleware/validateQuery';
-import { upload, normalizeCloudinaryFile } from '../config/upload';
+import { uploadVideo, listVideos, getVideoById, reprocessVideo, streamVideo, deleteVideo } from '../controllers/video.controller.js';
+import { authenticate } from '../middleware/authenticate.js';
+import { authorize } from '../middleware/authorize.js';
+import { validateQuery } from '../middleware/validateQuery.js';
+import { upload, normalizeCloudinaryFile } from '../config/upload.js';
 import { videoListQuerySchema } from '@video-app/shared';
 
 const router = Router();

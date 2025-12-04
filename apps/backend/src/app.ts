@@ -2,9 +2,9 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
-import { config } from './config';
-import authRoutes from './routes/auth.routes';
-import videoRoutes from './routes/video.routes';
+import { config } from './config/index.js';
+import authRoutes from './routes/auth.routes.js';
+import videoRoutes from './routes/video.routes.js';
 
 const app = express();
 

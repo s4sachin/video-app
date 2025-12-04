@@ -1,8 +1,8 @@
 import { createServer } from 'http';
-import app from './app';
-import { config } from './config';
-import { connectDB } from './config/database';
-import { initSocket } from './socket';
+import app from './app.js';
+import { config } from './config/index.js';
+import { connectDB } from './config/database.js';
+import { initSocket } from './socket/index.js';
 
 const startServer = async () => {
   try {

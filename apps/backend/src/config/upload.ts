@@ -1,7 +1,7 @@
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
-import { config } from './index';
+import { config } from './index.js';
 import { ALLOWED_VIDEO_TYPES, MAX_FILE_SIZE } from '@video-app/shared';
 import { v2 as cloudinary } from 'cloudinary';
 import { CloudinaryStorage } from 'multer-storage-cloudinary';
