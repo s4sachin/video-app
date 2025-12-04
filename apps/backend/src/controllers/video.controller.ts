@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { Video } from '../models/Video';
 import { UploadVideoInput, VideoListQuery } from '@video-app/shared';
 import { processVideo } from '../services/processing.service';
+import fs from 'fs';
 
 export const uploadVideo = async (req: Request, res: Response) => {
   try {
@@ -238,7 +239,6 @@ export const streamVideo = async (req: Request, res: Response) => {
     }
 
     const videoPath = video.fileInfo.path;
-    const fs = require('fs');
     const stat = fs.statSync(videoPath);
     const fileSize = stat.size;
     const range = req.headers.range;
